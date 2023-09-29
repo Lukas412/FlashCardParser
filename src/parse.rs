@@ -1,36 +1,46 @@
-use crate::Topic;
+use crate::{Card, Topic};
 use derive_more::{Display, Error, From};
 
 #[derive(Debug, Display, Error, From)]
 pub enum ParseError<'a> {
     TopicTitleIsEmpty,
+    TopicTitleIsMultipleLinesLong { title: &'a str },
     CardQuestionIsEmpty,
     CardAnswerIsIsEmpty,
-    TopicTitleIsMutltipleLinesLong { title: &'a str },
 }
 
-pub(crate) fn topic(input: &str) -> Result<(&str, Topic), ParseError> {
+pub(crate) fn topic<'a>(input: &'a str) -> Result<(&'a str, Topic<'a>), ParseError> {
+    let input = input.trim();
     let (input, title) = topic_title(input)?;
-    let (input, cards) = cards(input)?;
-    Ok((input, Topic { title, cards }))
+    let cards = cards(input)?;
+    Ok((input, Topic::new(title, cards)))
 }
 
 fn topic_title(input: &str) -> Result<(&str, &str), ParseError> {
     let (input, text) =
         text_until_card_separator(input).map_err(|_| ParseError::TopicTitleIsEmpty)?;
     if text.contains("\n") {
-        return Err(ParseError::TopicTitleIsMutltipleLinesLong { title: text });
+        return Err(ParseError::TopicTitleIsMultipleLinesLong { title: text });
     }
     Ok((input, text))
 }
 
-fn cards(input: &str) -> Result<(&str, &str), ExpectedCard> {
-    let input = take_card_separator(input)?;
-    let results = Vec::new();
+fn cards(mut input: &str) -> Result<Vec<Card>, ParseError> {
+    let mut results = Vec::new();
+    while !input.is_empty() {
+        let (remaining, card) = card(input)?;
+        results.push(card);
+        input = remaining;
+    }
+    Ok(results)
 }
 
-fn card(input: &str) -> Result<(&str, &str), ExpectedCard> {
-    let input = take_card_separator(input)?;
+fn card(input: &str) -> Result<(&str, Card), ParseError> {
+    let (input, question) =
+        text_until_card_divider(input).map_err(|_| ParseError::CardQuestionIsEmpty)?;
+    let (input, answer) =
+        text_until_card_separator(input).map_err(|_| ParseError::CardAnswerIsIsEmpty)?;
+    Ok((input, Card::new(question, answer)))
 }
 
 struct TextIsEmpty;
