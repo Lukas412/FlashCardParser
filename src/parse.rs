@@ -2,7 +2,7 @@ use crate::{Card, Topic};
 use derive_more::{Display, Error, From};
 use nom::FindSubstring;
 
-#[derive(Debug, Display, Error, From)]
+#[derive(Debug, Clone, Display, Error, From, Eq, PartialEq, Ord, PartialOrd)]
 pub enum ParseError<'a> {
     TopicTitleIsEmpty,
     TopicTitleIsMultipleLinesLong { title: &'a str },
@@ -75,28 +75,61 @@ fn split_text<'a>(separator: &str, input: &'a str) -> (&'a str, &'a str) {
 
 #[cfg(test)]
 mod test {
-    use crate::parse::card;
+    use crate::parse::{card, cards};
+    use crate::{Card, ParseError};
+    use std::vec;
+
+    #[test]
+    fn can_parse_multiple_cards() {
+        let input = "First Card Question\n/-\nFirst Card Answer\n/==\nSecond Card Question\n/-\nSecond Card Answer";
+        let expected = Ok(vec![
+            Card::new("First Card Question", "First Card Answer"),
+            Card::new("Second Card Question", "Second Card Answer"),
+        ]);
+        let actual = cards(input);
+        assert_eq!(expected, actual);
+    }
 
     #[test]
     fn can_parse_card() {
+        let input = "Card Question\n/-\nCard Answer";
+        let expected = Ok(("", Card::new("Card Question", "Card Answer")));
+        let actual = card(input);
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn can_parse_card_with_separator_at_end() {
         let input = "Card Question\n\
              /-\n\
-             Card Answer";
+             Card Answer\n\
+             /==";
+        let expected = Ok(("", Card::new("Card Question", "Card Answer")));
         let actual = card(input);
-        let (actual_input, actual_card) = match actual {
-            Err(error) => panic!("card value should be parsed: {}", error),
-            Ok(actual) => actual,
-        };
-        assert!(actual_input.is_empty(), "input should be fully consumed");
-        assert_eq!(
-            actual_card.question(),
-            "Card Question",
-            "question should be parsed correctly"
-        );
-        assert_eq!(
-            actual_card.answer(),
-            "Card Answer",
-            "answer should be parsed correctly"
-        );
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn can_parse_card_with_texts_inline_with_divider() {
+        let input = "Question\n/-Answer\n";
+        let expected = Ok(("", Card::new("Question", "Answer")));
+        let actual = card(input);
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn cannot_parse_card_with_empty_question() {
+        let input = "/-\nAnswer\n/==";
+        let expected = Err(ParseError::CardQuestionIsEmpty);
+        let actual = card(input);
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn cannot_parse_card_with_empty_answer() {
+        let input = "Question/-\n\n/==";
+        let expected = Err(ParseError::CardQuestionIsEmpty);
+        let actual = card(input);
+        assert_eq!(expected, actual);
     }
 }

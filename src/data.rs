@@ -1,5 +1,6 @@
 use crate::parse::{topic, ParseError};
 
+#[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd)]
 pub struct Topic<'a> {
     title: &'a str,
     cards: Vec<Card<'a>>,
@@ -24,6 +25,7 @@ impl<'a> Topic<'a> {
     }
 }
 
+#[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd)]
 pub struct Card<'a> {
     question: &'a str,
     answer: &'a str,
