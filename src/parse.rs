@@ -75,16 +75,16 @@ fn split_text<'a>(separator: &str, input: &'a str) -> (&'a str, &'a str) {
 
 #[cfg(test)]
 mod test {
-    use crate::parse::{card, cards};
+    use super::*;
     use crate::{Card, ParseError};
     use std::vec;
 
     #[test]
     fn can_parse_multiple_cards() {
-        let input = "First Card Question\n/-\nFirst Card Answer\n/==\nSecond Card Question\n/-\nSecond Card Answer";
+        let input = "First Question\n/-\nFirst Answer\n/==\nSecond Question\n/-\nSecond Answer";
         let expected = Ok(vec![
-            Card::new("First Card Question", "First Card Answer"),
-            Card::new("Second Card Question", "Second Card Answer"),
+            Card::new("First Question", "First Answer"),
+            Card::new("Second Question", "Second Answer"),
         ]);
         let actual = cards(input);
         assert_eq!(expected, actual);
@@ -92,19 +92,16 @@ mod test {
 
     #[test]
     fn can_parse_card() {
-        let input = "Card Question\n/-\nCard Answer";
-        let expected = Ok(("", Card::new("Card Question", "Card Answer")));
+        let input = "Question\n/-\nAnswer";
+        let expected = Ok(("", Card::new("Question", "Answer")));
         let actual = card(input);
         assert_eq!(expected, actual);
     }
 
     #[test]
     fn can_parse_card_with_separator_at_end() {
-        let input = "Card Question\n\
-             /-\n\
-             Card Answer\n\
-             /==";
-        let expected = Ok(("", Card::new("Card Question", "Card Answer")));
+        let input = "Question\n/-\nAnswer\n/==";
+        let expected = Ok(("", Card::new("Question", "Answer")));
         let actual = card(input);
         assert_eq!(expected, actual);
     }
@@ -119,7 +116,7 @@ mod test {
 
     #[test]
     fn cannot_parse_card_with_empty_question() {
-        let input = "/-\nAnswer\n/==";
+        let input = "\n/-\nAnswer\n/==";
         let expected = Err(ParseError::CardQuestionIsEmpty);
         let actual = card(input);
         assert_eq!(expected, actual);
@@ -128,7 +125,7 @@ mod test {
     #[test]
     fn cannot_parse_card_with_empty_answer() {
         let input = "Question/-\n\n/==";
-        let expected = Err(ParseError::CardQuestionIsEmpty);
+        let expected = Err(ParseError::CardAnswerIsIsEmpty);
         let actual = card(input);
         assert_eq!(expected, actual);
     }
