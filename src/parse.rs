@@ -73,12 +73,6 @@ fn split_text<'a>(separator: &str, input: &'a str) -> (&'a str, &'a str) {
     (input, text)
 }
 
-fn trimmed_line(input: &str) -> (&str, &str) {
-    let (input, line) = line(input);
-    let line = line.trim();
-    (input, line)
-}
-
 fn line(input: &str) -> (&str, &str) {
     match input.find_substring("\n") {
         Some(index) => {
