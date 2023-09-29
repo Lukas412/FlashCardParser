@@ -65,11 +65,11 @@ fn text_until_card_divider(input: &str) -> Result<(&str, &str), TextIsEmpty> {
 }
 
 fn split_text<'a>(separator: &str, input: &'a str) -> (&'a str, &'a str) {
-    let (input, text) = match input.find_substring(separator) {
+    let (text, input) = match input.find_substring(separator) {
         Some(index) => input.split_at(index),
-        None => ("", input),
+        None => (input, ""),
     };
-    input.strip_prefix("\n/==").unwrap_or(input);
+    let input = input.strip_prefix(separator).unwrap_or(input);
     (input, text)
 }
 
