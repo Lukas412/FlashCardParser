@@ -1,5 +1,6 @@
 use crate::{Card, Topic};
 use derive_more::{Display, Error, From};
+use nom::FindSubstring;
 
 #[derive(Debug, Display, Error, From)]
 pub enum ParseError<'a> {
@@ -63,31 +64,13 @@ fn text_until_card_divider(input: &str) -> Result<(&str, &str), TextIsEmpty> {
     Ok((input, text))
 }
 
-fn split_text(separator: &str, input: &str) -> (&str, &str) {
-    let (input, text) = match input.find_substring("\n==") {
+fn split_text<'a>(separator: &str, input: &'a str) -> (&'a str, &'a str) {
+    let (input, text) = match input.find_substring(separator) {
         Some(index) => input.split_at(index),
         None => ("", input),
     };
     input.strip_prefix("\n/==").unwrap_or(input);
     (input, text)
-}
-
-fn take_card_divider(input: &str) -> Result<&str, ExpectedCardDivider> {
-    let (input, line) = trimmed_line(input);
-    if line != "&" {
-        return Err(ExpectedCardDivider { line });
-    }
-    Ok(input)
-}
-
-fn take_empty_lines(mut input: &str) -> &str {
-    loop {
-        let (remaining, line) = trimmed_line(input);
-        if line == "" || input == "" {
-            return input;
-        }
-        input = remaining;
-    }
 }
 
 fn trimmed_line(input: &str) -> (&str, &str) {
