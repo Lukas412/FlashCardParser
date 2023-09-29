@@ -1,4 +1,4 @@
-pub use data::{Card, Topic};
+pub use {data::{Card, Topic}, parse::ParseError};
 
 mod data;
 mod owned;
