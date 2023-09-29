@@ -72,3 +72,31 @@ fn split_text<'a>(separator: &str, input: &'a str) -> (&'a str, &'a str) {
     input.strip_prefix("\n/==").unwrap_or(input);
     (input, text)
 }
+
+#[cfg(test)]
+mod test {
+    use crate::parse::card;
+
+    #[test]
+    fn can_parse_card() {
+        let input = "Card Question\n\
+             /-\n\
+             Card Answer";
+        let actual = card(input);
+        let (actual_input, actual_card) = match actual {
+            Err(error) => panic!("card value should be parsed: {}", error),
+            Ok(actual) => actual,
+        };
+        assert!(actual_input.is_empty(), "input should be fully consumed");
+        assert_eq!(
+            actual_card.question(),
+            "Card Question",
+            "question should be parsed correctly"
+        );
+        assert_eq!(
+            actual_card.answer(),
+            "Card Answer",
+            "answer should be parsed correctly"
+        );
+    }
+}
