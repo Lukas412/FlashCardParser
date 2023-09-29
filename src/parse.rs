@@ -10,11 +10,11 @@ pub enum ParseError<'a> {
     CardAnswerIsIsEmpty,
 }
 
-pub(crate) fn topic<'a>(input: &'a str) -> Result<(&'a str, Topic<'a>), ParseError> {
+pub(crate) fn topic<'a>(input: &'a str) -> Result<Topic<'a>, ParseError> {
     let input = input.trim();
     let (input, title) = topic_title(input)?;
     let cards = cards(input)?;
-    Ok((input, Topic::new(title, cards)))
+    Ok(Topic::new(title, cards))
 }
 
 fn topic_title(input: &str) -> Result<(&str, &str), ParseError> {
@@ -78,6 +78,48 @@ mod test {
     use super::*;
     use crate::{Card, ParseError};
     use std::vec;
+
+    #[test]
+    fn can_parse_topic() {
+        let input = "Title\n/==\nQuestion\n/-\nAnswer\n/==";
+        let expected = Ok(Topic::new("Title", vec![Card::new("Question", "Answer")]));
+        let actual = topic(input);
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn can_parse_topic_title() {
+        let input = "Title\n/==";
+        let expected = Ok(("", "Title"));
+        let actual = topic_title(input);
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn can_parse_topic_title_with_empty_lines() {
+        let input = "Title\n\n\n/==";
+        let expected = Ok(("", "Title"));
+        let actual = topic_title(input);
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn cannot_parse_topic_title_when_empty() {
+        let input = "\n\n/==";
+        let expected = Err(ParseError::TopicTitleIsEmpty);
+        let actual = topic_title(input);
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn cannot_parse_topic_title_when_multiple_lines_long() {
+        let input = "Title\nWith Second Line\n\n/==";
+        let expected = Err(ParseError::TopicTitleIsMultipleLinesLong {
+            title: "Title\nWith Second Line",
+        });
+        let actual = topic_title(input);
+        assert_eq!(expected, actual);
+    }
 
     #[test]
     fn can_parse_multiple_cards() {

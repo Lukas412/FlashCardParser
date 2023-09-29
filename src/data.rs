@@ -8,8 +8,7 @@ pub struct Topic<'a> {
 
 impl<'a> Topic<'a> {
     pub fn from_str(input: &'a str) -> Result<Self, ParseError> {
-        let (_, topic) = topic(input)?;
-        Ok(topic)
+        topic(input)
     }
 
     pub fn title(&self) -> &str {
