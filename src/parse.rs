@@ -72,14 +72,3 @@ fn split_text<'a>(separator: &str, input: &'a str) -> (&'a str, &'a str) {
     input.strip_prefix("\n/==").unwrap_or(input);
     (input, text)
 }
-
-fn line(input: &str) -> (&str, &str) {
-    match input.find_substring("\n") {
-        Some(index) => {
-            let (input, line) = input.split_at(index);
-            let input = &input[1..];
-            (input, line)
-        }
-        None => ("", input),
-    }
-}
