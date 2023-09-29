@@ -73,7 +73,7 @@ fn split_text(separator: &str, input: &str) -> (&str, &str) {
 }
 
 fn take_card_divider(input: &str) -> Result<&str, ExpectedCardDivider> {
-    let (input, line) = trimed_line(input);
+    let (input, line) = trimmed_line(input);
     if line != "&" {
         return Err(ExpectedCardDivider { line });
     }
@@ -82,7 +82,7 @@ fn take_card_divider(input: &str) -> Result<&str, ExpectedCardDivider> {
 
 fn take_empty_lines(mut input: &str) -> &str {
     loop {
-        let (remaining, line) = trimed_line(input);
+        let (remaining, line) = trimmed_line(input);
         if line == "" || input == "" {
             return input;
         }
@@ -90,7 +90,7 @@ fn take_empty_lines(mut input: &str) -> &str {
     }
 }
 
-fn trimed_line(input: &str) -> (&str, &str) {
+fn trimmed_line(input: &str) -> (&str, &str) {
     let (input, line) = line(input);
     let line = line.trim();
     (input, line)
