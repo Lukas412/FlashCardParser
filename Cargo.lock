@@ -3,14 +3,6 @@
 version = 3
 
 [[package]]
-name = "FlashCardParser"
-version = "0.1.0"
-dependencies = [
- "derive_more",
- "nom",
-]
-
-[[package]]
 name = "derive_more"
 version = "1.0.0-beta.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -29,6 +21,14 @@ dependencies = [
  "quote",
  "syn",
  "unicode-xid",
+]
+
+[[package]]
+name = "flash_card_parser"
+version = "0.1.0"
+dependencies = [
+ "derive_more",
+ "nom",
 ]
 
 [[package]]
