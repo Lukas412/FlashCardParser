@@ -1,3 +1,4 @@
+use std::fmt::{Display, Formatter};
 use serde::{Deserialize, Serialize};
 use crate::parse::{topic, ParseError};
 
@@ -25,6 +26,18 @@ impl<'a> Topic<'a> {
     }
 }
 
+impl<'a> Display for Topic<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "Topic: {}", self.title)?;
+        writeln!(f, "")?;
+        for card in &self.cards {
+            writeln!(f, "{}", card)?;
+            writeln!(f, "")?;
+        }
+        Ok(())
+    }
+}
+
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Serialize, Deserialize)]
 pub struct Card<'a> {
     question: &'a str,
@@ -42,5 +55,13 @@ impl<'a> Card<'a> {
 
     pub(crate) fn new(question: &'a str, answer: &'a str) -> Self {
         Self { question, answer }
+    }
+}
+
+impl<'a> Display for Card<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "=== Card ===")?;
+        writeln!(f, "Question: {}", self.question)?;
+        writeln!(f, "Answer: {}", self.answer)
     }
 }
