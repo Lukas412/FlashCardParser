@@ -32,7 +32,6 @@ impl<'a> Display for Topic<'a> {
         writeln!(f, "")?;
         for card in &self.cards {
             writeln!(f, "{}", card)?;
-            writeln!(f, "")?;
         }
         Ok(())
     }
