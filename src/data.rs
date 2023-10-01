@@ -1,6 +1,7 @@
+use serde::{Deserialize, Serialize};
 use crate::parse::{topic, ParseError};
 
-#[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd)]
+#[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Serialize, Deserialize)]
 pub struct Topic<'a> {
     title: &'a str,
     cards: Vec<Card<'a>>,
@@ -24,7 +25,7 @@ impl<'a> Topic<'a> {
     }
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd)]
+#[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Serialize, Deserialize)]
 pub struct Card<'a> {
     question: &'a str,
     answer: &'a str,
